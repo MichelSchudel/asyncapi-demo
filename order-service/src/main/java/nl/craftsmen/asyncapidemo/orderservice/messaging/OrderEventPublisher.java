@@ -1,6 +1,6 @@
 package nl.craftsmen.asyncapidemo.orderservice.messaging;
 
-import nl.craftsmen.asyncapidemo.orderservice.event.OrderCreatedEvent;
+import nl.craftsmen.asyncapidemo.orderservice.event.OrderCreated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -19,9 +19,9 @@ public class OrderEventPublisher {
         this.streamBridge = streamBridge;
     }
 
-    public void publish(OrderCreatedEvent event) {
+    public void publish(OrderCreated event) {
         streamBridge.send(BINDING_NAME, event);
-        log.info("Published OrderCreated event with id {}", event.id());
+        log.info("Published OrderCreated event with id {}", event.getId());
     }
 
 }

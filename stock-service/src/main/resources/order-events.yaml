@@ -54,6 +54,7 @@ components:
         - source
         - items
     OrderSource:
+      title: OrderSource
       type: string
       description: Origin that raised the order.
       enum:

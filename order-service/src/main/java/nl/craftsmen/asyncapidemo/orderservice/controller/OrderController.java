@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import nl.craftsmen.asyncapidemo.orderservice.event.OrderCreatedEvent;
+import nl.craftsmen.asyncapidemo.orderservice.event.OrderCreated;
 import nl.craftsmen.asyncapidemo.orderservice.event.OrderSource;
 import nl.craftsmen.asyncapidemo.orderservice.messaging.OrderEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -35,16 +35,20 @@ public class OrderController {
     @ApiResponse(responseCode = "400", description = "Invalid order payload")
     public ResponseEntity<OrderCreatedResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
         List<nl.craftsmen.asyncapidemo.orderservice.event.OrderItem> items = orderRequest.items().stream()
-                .map(item -> new nl.craftsmen.asyncapidemo.orderservice.event.OrderItem(item.productId(), item.quantity()))
+                .map(item -> {
+                    var orderItem = new nl.craftsmen.asyncapidemo.orderservice.event.OrderItem();
+                    orderItem.setProductId(item.productId());
+                    orderItem.setQuantity(item.quantity());
+                    return orderItem;
+                })
                 .toList();
 
         String id = UUID.randomUUID().toString();
 
-        OrderCreatedEvent event = new OrderCreatedEvent(
-                id,
-                OrderSource.CUSTOMER,
-                items
-        );
+        OrderCreated event = new OrderCreated();
+        event.setId(id);
+        event.setSource(OrderSource.CUSTOMER);
+        event.setItems(items);
 
         orderEventPublisher.publish(event);
 

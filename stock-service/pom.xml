@@ -19,6 +19,9 @@
     <properties>
         <npx.executable>npx</npx.executable>
         <asyncapi.docs.output>${project.build.directory}/generated-resources/static/asyncapi-docs</asyncapi.docs.output>
+        <asyncapi.models.root>${project.build.directory}/generated-sources/asyncapi-models</asyncapi.models.root>
+        <asyncapi.models.package>nl.craftsmen.asyncapidemo.stockservice.event</asyncapi.models.package>
+        <asyncapi.models.output>${asyncapi.models.root}/nl/craftsmen/asyncapidemo/stockservice/event</asyncapi.models.output>
     </properties>
 
     <dependencies>
@@ -84,6 +87,48 @@
                             <environmentVariables>
                                 <PUPPETEER_SKIP_DOWNLOAD>true</PUPPETEER_SKIP_DOWNLOAD>
                             </environmentVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-asyncapi-models</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${npx.executable}</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+                                <argument>@asyncapi/cli</argument>
+                                <argument>generate</argument>
+                                <argument>models</argument>
+                                <argument>java</argument>
+                                <argument>src/main/resources/order-events-receive.yaml</argument>
+                                <argument>-o</argument>
+                                <argument>${asyncapi.models.output}</argument>
+                                <argument>--packageName=${asyncapi.models.package}</argument>
+                                <argument>--javaJackson</argument>
+                                <argument>--javaArrayType=List</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>add-asyncapi-models-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${asyncapi.models.root}</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>
