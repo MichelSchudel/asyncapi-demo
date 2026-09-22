@@ -16,7 +16,16 @@
     <name>stock-service</name>
     <description>Consumer that listens for OrderCreated events via Spring Cloud Stream</description>
 
+    <properties>
+        <npx.executable>npx</npx.executable>
+        <asyncapi.docs.output>${project.build.directory}/generated-resources/static/asyncapi-docs</asyncapi.docs.output>
+    </properties>
+
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream-binder-kafka</artifactId>
@@ -34,10 +43,50 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.build.directory}/generated-resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-asyncapi-docs</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${npx.executable}</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+                                <argument>@asyncapi/cli</argument>
+                                <argument>generate</argument>
+                                <argument>fromTemplate</argument>
+                                <argument>src/main/resources/order-events-receive.yaml</argument>
+                                <argument>@asyncapi/html-template@latest</argument>
+                                <argument>-o</argument>
+                                <argument>${asyncapi.docs.output}</argument>
+                                <argument>--force-write</argument>
+                                <argument>-i</argument>
+                            </arguments>
+                            <environmentVariables>
+                                <PUPPETEER_SKIP_DOWNLOAD>true</PUPPETEER_SKIP_DOWNLOAD>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
