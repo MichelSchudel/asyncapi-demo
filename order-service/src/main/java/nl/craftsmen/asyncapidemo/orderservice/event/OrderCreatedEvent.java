@@ -1,10 +1,12 @@
 package nl.craftsmen.asyncapidemo.orderservice.event;
 
+import java.util.List;
+
 public record OrderCreatedEvent(
 
         String id,
-        String productId,
-        int quantity
+        OrderSource source,
+        List<OrderItem> items
 
 ) {
 }

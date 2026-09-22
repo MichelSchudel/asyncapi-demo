@@ -15,8 +15,8 @@ public class OrderEventConsumer {
 
     @Bean
     public Consumer<OrderCreatedEvent> stockUpdate() {
-        return event -> log.info("Received OrderCreated event: id={}, productId={}, quantity={}",
-                event.id(), event.productId(), event.quantity());
+        return event -> log.info("Received OrderCreated event: id={}, source={}, items={}",
+                event.id(), event.source(), event.items());
     }
 
 }

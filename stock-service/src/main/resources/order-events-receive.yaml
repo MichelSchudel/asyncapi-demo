@@ -1,0 +1,33 @@
+# order-events-receive.yaml — owned by the Stock Service team
+asyncapi: 3.0.0
+info:
+  title: Stock update
+  version: 1.0.0
+  description: |-
+    The stock service consumes order creation events to update stock levels.
+    ### Check out its awesome features:
+
+    * Receiving a created order
+servers:
+  local:
+    host: localhost:19092
+    protocol: kafka
+    description: >
+      Local Redpanda broker (Kafka API compatible) started via
+      docker-compose.yml, matching spring.cloud.stream.kafka.binder.brokers
+      in application.yml.
+channels:
+  orderCreated:
+    $ref: './order-events.yaml#/channels/orderCreated'
+operations:
+  receiveOrderCreated:
+    action: receive
+    channel:
+      $ref: '#/channels/orderCreated'
+    summary: Consume a created order from the orders.created channel.
+    bindings:
+      kafka:
+        groupId:
+          type: string
+          enum:
+            - stock-service
