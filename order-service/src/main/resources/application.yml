@@ -12,3 +12,5 @@ spring:
       kafka:
         binder:
           brokers: localhost:19092
+          configuration:
+            client.id: order-service
