@@ -4,13 +4,11 @@ server:
 spring:
   application:
     name: order-service
-  kafka:
-    bootstrap-servers: localhost:19092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
-app:
-  kafka:
-    topic:
-      order-created: orders.created
+  cloud:
+    stream:
+      bindings:
+        orderCreated-out-0:
+          destination: orders.created
+      kafka:
+        binder:
+          brokers: localhost:19092

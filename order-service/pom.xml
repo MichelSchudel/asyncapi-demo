@@ -14,7 +14,11 @@
     <packaging>jar</packaging>
 
     <name>order-service</name>
-    <description>REST API that accepts orders and publishes OrderCreated events to Kafka</description>
+    <description>REST API that accepts orders and publishes OrderCreated events via Spring Cloud Stream</description>
+
+    <properties>
+        <springdoc-openapi.version>3.1.1</springdoc-openapi.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -26,12 +30,17 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-kafka</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc-openapi.version}</version>
         </dependency>
 
         <dependency>

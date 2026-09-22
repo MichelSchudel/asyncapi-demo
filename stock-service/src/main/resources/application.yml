@@ -4,19 +4,18 @@ server:
 spring:
   application:
     name: stock-service
-  kafka:
-    bootstrap-servers: localhost:19092
-    consumer:
-      group-id: stock-service
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: nl.craftsmen.asyncapidemo.stockservice.dto
-        spring.json.value.default.type: nl.craftsmen.asyncapidemo.stockservice.dto.OrderCreatedEvent
-        spring.json.use.type.headers: false
-
-app:
-  kafka:
-    topic:
-      order-created: orders.created
+  cloud:
+    function:
+      definition: stockUpdate
+    stream:
+      bindings:
+        stockUpdate-in-0:
+          destination: orders.created
+          group: stock-service
+      kafka:
+        binder:
+          brokers: localhost:19092
+        bindings:
+          stockUpdate-in-0:
+            consumer:
+              startOffset: earliest

@@ -14,12 +14,12 @@
     <packaging>jar</packaging>
 
     <name>stock-service</name>
-    <description>Kafka consumer that listens for OrderCreated events</description>
+    <description>Consumer that listens for OrderCreated events via Spring Cloud Stream</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-kafka</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

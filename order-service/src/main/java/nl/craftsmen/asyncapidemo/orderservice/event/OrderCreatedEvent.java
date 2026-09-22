@@ -1,4 +1,4 @@
-package nl.craftsmen.asyncapidemo.orderservice.kafka;
+package nl.craftsmen.asyncapidemo.orderservice.event;
 
 public record OrderCreatedEvent(
 
