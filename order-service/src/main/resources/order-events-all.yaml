@@ -1,0 +1,37 @@
+asyncapi: 3.0.0
+info:
+  title: Stock service
+  version: 1.0.0
+
+channels:
+  orderCreated:
+    description: The topic on which order creation messages will be produced and consumed.
+    address: orders.created
+    messages:
+      OrderCreated:
+        $ref: '#/components/messages/OrderCreated'
+
+operations:
+  receiveOrderCreated:
+    action: send
+    channel:
+      $ref: '#/channels/orderCreated'
+    messages:
+      - $ref: '#/channels/orderCreated/messages/OrderCreated'
+
+components:
+  messages:
+    OrderCreated:
+      payload:
+        $ref: '#/components/schemas/Order'
+
+  schemas:
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        quantity:
+          type: integer

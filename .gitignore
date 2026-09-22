@@ -1,3 +1,8 @@
 html-docs
 .idea
 **/target/*
+/order-events-send.bundled.yaml
+/html-docs-example/
+/kotlin-models-final-verify/
+/java-models-final-verify/
+/html-docs-gcp/

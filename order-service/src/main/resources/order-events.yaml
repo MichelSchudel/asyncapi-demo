@@ -1,0 +1,50 @@
+asyncapi: 3.0.0
+info:
+  title: Order events (shared contract)
+  version: 1.0.0
+  description: >
+    Shared channel and message definitions for order events.
+    Owned by the Order Service team. Consuming services should
+    $ref this file rather than redefining the schema locally.
+
+channels:
+  orderCreated:
+    address: orders.created
+    messages:
+      OrderCreated:
+        $ref: '#/components/messages/OrderCreated'
+
+components:
+  messages:
+    OrderCreated:
+      summary: Information about a created order.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/Order'
+      examples:
+        - payload:
+            id: "f1451166-a896-4f02-a741-69a51b19b277"
+            productId: "12346"
+            quantity: 1
+
+  schemas:
+    Order:
+      title: OrderCreated
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Unique identification of the order.
+        productId:
+          type: string
+          description: Unique identification product being ordered.
+        quantity:
+          type: integer
+          description: Quantity of the the product being ordered.
+          minimum: 1
+          maximum: 10
+      required:
+        - id
+        - productId
+        - quantity

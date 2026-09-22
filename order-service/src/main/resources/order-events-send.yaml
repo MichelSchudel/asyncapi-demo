@@ -1,0 +1,32 @@
+# order-events-send.yaml — owned by the Order Service team
+asyncapi: 3.0.0
+info:
+  title: Order creation
+  version: 1.0.0
+  description: |-
+    The order creation channel publishes new orders coming in.
+    ### Check out its awesome features:
+    
+    * Creating an order
+servers:
+  local:
+    host: localhost:19092
+    protocol: kafka
+    description: >
+      Local Redpanda broker (Kafka API compatible) started via
+      docker-compose.yml, matching spring.kafka.bootstrap-servers
+      in application.yml.
+channels:
+  orderCreated:
+    $ref: './order-events.yaml#/channels/orderCreated'
+operations:
+  sendOrderCreated:
+    action: send
+    channel:
+      $ref: '#/channels/orderCreated'
+    bindings:
+      kafka:
+        clientId:
+          type: string
+          enum:
+            - order-service

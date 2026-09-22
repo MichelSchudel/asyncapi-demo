@@ -1,0 +1,53 @@
+services:
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.3.1
+    container_name: redpanda
+    command:
+      - redpanda
+      - start
+      - --node-id=0
+      - --smp=1
+      - --memory=1G
+      - --reserve-memory=0M
+      - --overprovisioned
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
+      - --rpc-addr=redpanda:33145
+      - --advertise-rpc-addr=redpanda:33145
+      - --mode=dev-container
+      - --default-log-level=info
+    ports:
+      - "19092:19092"   # Kafka API (use this from the host, e.g. bootstrap-servers=localhost:19092)
+      - "9644:9644"     # Admin API
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  console:
+    image: docker.redpanda.com/redpandadata/console:v2.8.2
+    container_name: redpanda-console
+    restart: on-failure
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "kafka:
+          brokers: [\"redpanda:9092\"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: [\"http://redpanda:9644\"]" > /tmp/config.yml
+        /app/console -config.filepath /tmp/config.yml
+    ports:
+      - "9000:8080"     # Redpanda Console UI -> http://localhost:9000
+
+volumes:
+  redpanda-data:
