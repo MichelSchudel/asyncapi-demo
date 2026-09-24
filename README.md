@@ -32,6 +32,11 @@ Start the interactive spec editor
 npx @asyncapi/cli start studio
 ```
 
+Validate the spec in the order-service:
+```
+npx @asyncapi/cli validate order-service/src/main/resources/order-events-send.yaml
+
+```
 Generate html docs for the message spec:
 ```
 npx @asyncapi/cli generate fromTemplate order-service/src/main/resources/order-events.yaml @asyncapi/html-template@latest -o ./html-docs --force-write -i    
