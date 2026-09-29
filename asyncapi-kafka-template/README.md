@@ -27,22 +27,34 @@ components/
   KafkaBindingYaml.js  -> application-asyncapi.yml
   MessagingClass.js    -> <Channel>Publisher.java / <Channel>Consumer.java
   ModelFile.js          -> one Java record or enum per named schema
+hooks/index.js       generate:before hook - pre-creates the output package directories
+                      (see the "directories" caveat below for why this is needed)
 ```
 
 ## Running it locally
 
 ```bash
 npm install
-npm run test:order-service   # generates into .output/order-service
-npm run test:stock-service   # generates into .output/stock-service
+npm run test:order-service   # generates into ../order-service/target/...
+npm run test:stock-service   # generates into ../stock-service/target/...
 npm test                     # both
 ```
 
 Each script runs the template directly against the real spec files in the sibling
-`order-service`/`stock-service` modules (not a toy fixture), passing the two required parameters:
+`order-service`/`stock-service` modules (not a toy fixture), with `-o` pointed at the module root
+and four parameters:
 
 - `javaPackage` — Java package for the generated record/enum models
 - `messagingPackage` — Java package for the generated publisher/consumer class
+- `javaSourceRoot` — root folder Java sources are written under (relative to `-o`)
+- `resourcesRoot` — root folder the Kafka binder config is written under (relative to `-o`)
+
+The template writes into full package-path-nested `<File name="...">`s, e.g.
+`${javaSourceRoot}/nl/craftsmen/.../event/OrderCreated.java`. The test scripts point
+`javaSourceRoot`/`resourcesRoot` at `target/generated-sources/asyncapi-template` and
+`target/generated-resources`, so generated code stays out of the hand-written `src/main` tree —
+same convention the `asyncapi-codegen` Java module uses. Point them at `src/main/java` /
+`src/main/resources` instead if you want the output checked into source control.
 
 ## A known environment caveat (not a template bug)
 
@@ -57,6 +69,16 @@ Separately, `@asyncapi/generator@3.4.1`'s `utils.exists()` calls `fs.promises.st
 in this specific version of the generator. Older Node releases silently tolerated it; Node 26 validates
 `fs.promises.stat`'s second argument and throws. Run this template's scripts under Node 22 (or any
 version predating that stricter validation) until upstream fixes it.
+
+## Directories aren't created automatically (also not a template bug)
+
+`@asyncapi/generator@3.4.1`'s React file writer (`saveContentToFile` in `lib/renderer/react.js`)
+writes every `<File>` with a plain `fs.writeFile` and never creates the file's parent directory
+first. That's harmless for a flat output folder, but `javaSourceRoot`/`resourcesRoot` here are
+usually brand-new, multi-level paths (`target/generated-sources/asyncapi-template/nl/craftsmen/...`)
+that don't exist yet, so generation fails with `ENOENT` on the first file that needs a genuinely new
+directory. `hooks/index.js` works around it with a `generate:before` hook that pre-creates the two
+package directories and the resources root from `generator.templateParams` before rendering starts.
 
 ## This template does **not** run as part of the Maven build
 
