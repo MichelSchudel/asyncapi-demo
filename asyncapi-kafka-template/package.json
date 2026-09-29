@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "AsyncAPI Generator template that produces the Spring Cloud Stream Kafka binder config, the publisher/consumer class and the Java record/enum models for one AsyncAPI operation.",
   "scripts": {
-    "clean": "node -e \"require('fs').rmSync('.output', { recursive: true, force: true })\"",
-    "test:order-service": "node -e \"require('fs').rmSync('.output/order-service', { recursive: true, force: true })\" && asyncapi generate fromTemplate ../order-service/src/main/resources/order-events-send.yaml . -o .output/order-service --param javaPackage=nl.craftsmen.asyncapidemo.orderservice.event --param messagingPackage=nl.craftsmen.asyncapidemo.orderservice.messaging --force-write",
-    "test:stock-service": "node -e \"require('fs').rmSync('.output/stock-service', { recursive: true, force: true })\" && asyncapi generate fromTemplate ../stock-service/src/main/resources/order-events-receive.yaml . -o .output/stock-service --param javaPackage=nl.craftsmen.asyncapidemo.stockservice.event --param messagingPackage=nl.craftsmen.asyncapidemo.stockservice.messaging --force-write",
-    "test": "npm run clean && npm run test:order-service && npm run test:stock-service"
+    "test:order-service": "asyncapi generate fromTemplate ../order-service/src/main/resources/order-events-send.yaml . -o ../order-service --param javaPackage=nl.craftsmen.asyncapidemo.orderservice.event --param messagingPackage=nl.craftsmen.asyncapidemo.orderservice.messaging --param javaSourceRoot=src/main/java --param resourcesRoot=src/main/resources --force-write",
+    "test:stock-service": "asyncapi generate fromTemplate ../stock-service/src/main/resources/order-events-receive.yaml . -o ../stock-service --param javaPackage=nl.craftsmen.asyncapidemo.stockservice.event --param messagingPackage=nl.craftsmen.asyncapidemo.stockservice.messaging --param javaSourceRoot=src/main/java --param resourcesRoot=src/main/resources --force-write",
+    "test": "npm run test:order-service && npm run test:stock-service"
   },
   "keywords": ["asyncapi", "generator", "template", "kafka", "spring-cloud-stream"],
   "author": "",
@@ -22,6 +21,14 @@
       },
       "messagingPackage": {
         "description": "Java package for the generated publisher/consumer class",
+        "required": true
+      },
+      "javaSourceRoot": {
+        "description": "Root folder Java sources are written under, e.g. src/main/java for a standard Maven/Gradle layout",
+        "required": true
+      },
+      "resourcesRoot": {
+        "description": "Root folder the Kafka binder config is written under, e.g. src/main/resources for a standard Maven/Gradle layout",
         "required": true
       }
     }

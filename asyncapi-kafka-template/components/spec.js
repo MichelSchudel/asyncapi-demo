@@ -33,6 +33,11 @@ export function readOperation(asyncapi) {
   };
 }
 
+/** Turns a Java package name into its directory path, e.g. "a.b.c" -> "a/b/c". */
+export function packagePath(javaPackage) {
+  return javaPackage.replace(/\./g, '/');
+}
+
 /** Named object/enum schemas, i.e. the ones that should become a Java record or enum. */
 export function namedSchemas(asyncapi) {
   return asyncapi.allSchemas().all()
