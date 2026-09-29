@@ -77,8 +77,9 @@ release fixes this itself, the override can be dropped.
 Separately, `@asyncapi/generator@3.4.1`'s `utils.exists()` calls `fs.promises.stat(path, fs.constants.F_OK)`
 — passing an access-flag number where `stat()` expects an options *object* — which is undoubtedly a bug
 in this specific version of the generator. Older Node releases silently tolerated it; Node 26 validates
-`fs.promises.stat`'s second argument and throws. Run this template's scripts under Node 22 (or any
-version predating that stricter validation) until upstream fixes it.
+`fs.promises.stat`'s second argument and throws. **Verified: Node 22.11.0 and Node 24.21.0 both work;
+Node 26.9.0 doesn't.** The exact version this started breaking at (25 or 26) hasn't been pinned down —
+only those three were tested.
 
 ## Directories aren't created automatically (also not a template bug)
 
@@ -90,5 +91,13 @@ that don't exist yet, so generation fails with `ENOENT` on the first file that n
 directory. `hooks/index.js` works around it with a `generate:before` hook that pre-creates the two
 package directories and the resources root from `generator.templateParams` before rendering starts.
 
-Building `order-service`/`stock-service` on this machine currently requires Node ≤ ~24 on `PATH`
-(or `-Dnode.executable=/path/to/compatible/node`) for the same reason.
+## One Node version that satisfies everything
+
+The html-docs step's toolchain (`@asyncapi/bundler`, `jsdom`, ...) declares `"node": ">=24"` in its
+own `engines` field, and fails outright under Node 22. Combined with the generator bug above
+(broken on Node 26, fine on 22), that looked like an unsatisfiable window until **Node 24.21.0
+was tested directly and works for both** — the html-docs step (needs ≥24) and this template's
+generation step (broken only starting somewhere after 24, confirmed on 26). So: put Node 24.x on
+`PATH` and both `generate-asyncapi-docs` and `generate-asyncapi-kafka-artifacts` work without
+touching `node.executable`/`npm.executable` at all. Those properties stay in the `pom.xml`s as an
+override point (e.g. if a future Node breaks something again), not because they're required today.
