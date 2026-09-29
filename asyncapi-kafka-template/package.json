@@ -5,6 +5,12 @@
   "keywords": ["asyncapi", "generator", "template", "kafka", "spring-cloud-stream"],
   "author": "",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22 <26"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
   "generator": {
     "apiVersion": "v3",
     "generator": ">=3.0.0 <4.0.0",
@@ -29,8 +35,7 @@
     }
   },
   "dependencies": {
-    "@asyncapi/generator-react-sdk": "^1.1.3",
-    "@asyncapi/parser": "^3.6.3"
+    "@asyncapi/generator-react-sdk": "^1.1.3"
   },
   "devDependencies": {
     "@asyncapi/cli": "^6.1.0"

@@ -1,0 +1,62 @@
+asyncapi: 3.0.0
+info:
+  title: Test events
+  version: 1.0.0
+servers:
+  local:
+    host: localhost:19092
+    protocol: kafka
+channels:
+  widgetCreated:
+    address: widgets.created
+    messages:
+      WidgetCreated:
+        contentType: application/json
+        payload:
+          $ref: '#/components/schemas/Widget'
+operations:
+  sendWidgetCreated:
+    action: send
+    channel:
+      $ref: '#/channels/widgetCreated'
+    bindings:
+      kafka:
+        clientId:
+          type: string
+          enum:
+            - widget-service
+components:
+  schemas:
+    Widget:
+      title: WidgetCreated
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          $ref: '#/components/schemas/WidgetStatus'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+      required:
+        - id
+        - status
+        - tags
+    WidgetStatus:
+      title: WidgetStatus
+      type: string
+      enum:
+        - NEW
+        - SHIPPED
+    Tag:
+      title: Tag
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+      required:
+        - key
+        - value

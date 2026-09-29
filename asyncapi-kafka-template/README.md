@@ -29,7 +29,15 @@ components/
   ModelFile.js          -> one Java record or enum per named schema
 hooks/index.js       generate:before hook - pre-creates the output package directories
                       (see the "directories" caveat below for why this is needed)
+test/
+  fixtures/*.yaml     self-contained AsyncAPI specs (send + receive) used only by this template's
+                      own tests - deliberately not the order-service/stock-service specs
+  generate.test.mjs    node:test suite; runs the real `asyncapi generate fromTemplate` CLI
+                      entrypoint (not the Generator class directly - see the file's own comment
+                      for why that distinction matters) and asserts on the generated output
 ```
+
+Run the tests with `npm test` (needs `npm install` first).
 
 ## Running it
 
@@ -79,7 +87,8 @@ Separately, `@asyncapi/generator@3.4.1`'s `utils.exists()` calls `fs.promises.st
 in this specific version of the generator. Older Node releases silently tolerated it; Node 26 validates
 `fs.promises.stat`'s second argument and throws. **Verified: Node 22.11.0 and Node 24.21.0 both work;
 Node 26.9.0 doesn't.** The exact version this started breaking at (25 or 26) hasn't been pinned down —
-only those three were tested.
+only those three were tested. `package.json`'s `engines` field (`>=22 <26`) reflects this; `npm test`
+reproduces the failure directly if you want to see it (or re-check it against a future generator release).
 
 ## Directories aren't created automatically (also not a template bug)
 
@@ -101,3 +110,18 @@ generation step (broken only starting somewhere after 24, confirmed on 26). So: 
 `PATH` and both `generate-asyncapi-docs` and `generate-asyncapi-kafka-artifacts` work without
 touching `node.executable`/`npm.executable` at all. Those properties stay in the `pom.xml`s as an
 override point (e.g. if a future Node breaks something again), not because they're required today.
+
+## Publishing this for others to use
+
+Structurally this follows the [AsyncAPI Generator's template requirements](https://www.asyncapi.com/docs/tools/generator/template-development):
+a `template/index.js` using the React render engine, a `generator` config block in `package.json`,
+and a dependency on `@asyncapi/generator-react-sdk`. `LICENSE` is included so it's actually reusable,
+not just labeled as such.
+
+The AsyncAPI docs only document resolving templates from an **npm registry** (public or private via
+`.npmrc`/Verdaccio/Nexus) — `asyncapi generate fromTemplate <spec> <package-name>[@version]`. They
+don't confirm whether a bare `github:user/repo` git specifier works as the template argument (the
+underlying installer, npm's Arborist, generally supports git specifiers the same way `npm install`
+does, so it plausibly works, but this hasn't been tested). The reliable, documented path is
+`npm publish` to a registry: pick a scope you actually own (`@craftsmen` here is a placeholder — one
+of these apply before publishing) or drop the scope entirely.
