@@ -1,0 +1,39 @@
+{
+  "name": "@craftsmen/asyncapi-kafka-spring-template",
+  "version": "1.0.0",
+  "description": "AsyncAPI Generator template that produces the Spring Cloud Stream Kafka binder config, the publisher/consumer class and the Java record/enum models for one AsyncAPI operation.",
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('.output', { recursive: true, force: true })\"",
+    "test:order-service": "node -e \"require('fs').rmSync('.output/order-service', { recursive: true, force: true })\" && asyncapi generate fromTemplate ../order-service/src/main/resources/order-events-send.yaml . -o .output/order-service --param javaPackage=nl.craftsmen.asyncapidemo.orderservice.event --param messagingPackage=nl.craftsmen.asyncapidemo.orderservice.messaging --force-write",
+    "test:stock-service": "node -e \"require('fs').rmSync('.output/stock-service', { recursive: true, force: true })\" && asyncapi generate fromTemplate ../stock-service/src/main/resources/order-events-receive.yaml . -o .output/stock-service --param javaPackage=nl.craftsmen.asyncapidemo.stockservice.event --param messagingPackage=nl.craftsmen.asyncapidemo.stockservice.messaging --force-write",
+    "test": "npm run clean && npm run test:order-service && npm run test:stock-service"
+  },
+  "keywords": ["asyncapi", "generator", "template", "kafka", "spring-cloud-stream"],
+  "author": "",
+  "license": "Apache-2.0",
+  "generator": {
+    "apiVersion": "v3",
+    "generator": ">=3.0.0 <4.0.0",
+    "supportedProtocols": ["kafka"],
+    "parameters": {
+      "javaPackage": {
+        "description": "Java package for the generated record/enum models",
+        "required": true
+      },
+      "messagingPackage": {
+        "description": "Java package for the generated publisher/consumer class",
+        "required": true
+      }
+    }
+  },
+  "dependencies": {
+    "@asyncapi/generator-react-sdk": "^1.1.3",
+    "@asyncapi/parser": "^3.6.3"
+  },
+  "devDependencies": {
+    "@asyncapi/cli": "^6.1.0"
+  },
+  "overrides": {
+    "uuid": "9.0.1"
+  }
+}
