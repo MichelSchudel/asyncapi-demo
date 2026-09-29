@@ -19,10 +19,14 @@
     <properties>
         <springdoc-openapi.version>3.1.1</springdoc-openapi.version>
         <npx.executable>npx</npx.executable>
+        <node.executable>node</node.executable>
+        <npm.executable>npm</npm.executable>
         <asyncapi.docs.output>${project.build.directory}/generated-resources/static/asyncapi-docs</asyncapi.docs.output>
-        <asyncapi.models.root>${project.build.directory}/generated-sources/asyncapi-models</asyncapi.models.root>
+        <asyncapi.template.dir>${project.basedir}/../asyncapi-kafka-template</asyncapi.template.dir>
+        <asyncapi.cli.entrypoint>${asyncapi.template.dir}/node_modules/@asyncapi/cli/bin/run_bin</asyncapi.cli.entrypoint>
+        <asyncapi.template.sources.root>${project.build.directory}/generated-sources/asyncapi-template</asyncapi.template.sources.root>
         <asyncapi.models.package>nl.craftsmen.asyncapidemo.orderservice.event</asyncapi.models.package>
-        <asyncapi.models.output>${asyncapi.models.root}/nl/craftsmen/asyncapidemo/orderservice/event</asyncapi.models.output>
+        <asyncapi.messaging.package>nl.craftsmen.asyncapidemo.orderservice.messaging</asyncapi.messaging.package>
     </properties>
 
     <dependencies>
@@ -100,25 +104,45 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>generate-asyncapi-models</id>
+                        <id>install-asyncapi-template</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${npx.executable}</executable>
-                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <executable>${npm.executable}</executable>
+                            <workingDirectory>${asyncapi.template.dir}</workingDirectory>
                             <arguments>
-                                <argument>@asyncapi/cli</argument>
+                                <argument>install</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-asyncapi-kafka-artifacts</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${node.executable}</executable>
+                            <workingDirectory>${asyncapi.template.dir}</workingDirectory>
+                            <arguments>
+                                <argument>${asyncapi.cli.entrypoint}</argument>
                                 <argument>generate</argument>
-                                <argument>models</argument>
-                                <argument>java</argument>
-                                <argument>src/main/resources/order-events-send.yaml</argument>
+                                <argument>fromTemplate</argument>
+                                <argument>${project.basedir}/src/main/resources/order-events-send.yaml</argument>
+                                <argument>${asyncapi.template.dir}</argument>
                                 <argument>-o</argument>
-                                <argument>${asyncapi.models.output}</argument>
-                                <argument>--packageName=${asyncapi.models.package}</argument>
-                                <argument>--javaJackson</argument>
-                                <argument>--javaArrayType=List</argument>
+                                <argument>${project.basedir}</argument>
+                                <argument>--param</argument>
+                                <argument>javaPackage=${asyncapi.models.package}</argument>
+                                <argument>--param</argument>
+                                <argument>messagingPackage=${asyncapi.messaging.package}</argument>
+                                <argument>--param</argument>
+                                <argument>javaSourceRoot=target/generated-sources/asyncapi-template</argument>
+                                <argument>--param</argument>
+                                <argument>resourcesRoot=target/generated-resources</argument>
+                                <argument>--force-write</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -137,7 +161,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${asyncapi.models.root}</source>
+                                <source>${asyncapi.template.sources.root}</source>
                             </sources>
                         </configuration>
                     </execution>

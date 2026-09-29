@@ -4,13 +4,5 @@ server:
 spring:
   application:
     name: order-service
-  cloud:
-    stream:
-      bindings:
-        orderCreated-out-0:
-          destination: orders.created
-      kafka:
-        binder:
-          brokers: localhost:19092
-          configuration:
-            client.id: order-service
+  config:
+    import: optional:classpath:/application-asyncapi.yml

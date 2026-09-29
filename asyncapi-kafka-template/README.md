@@ -31,30 +31,40 @@ hooks/index.js       generate:before hook - pre-creates the output package direc
                       (see the "directories" caveat below for why this is needed)
 ```
 
-## Running it locally
+## Running it
+
+This template deliberately has no knowledge of its consumers — no hard-coded paths to
+`order-service`/`stock-service` anywhere in here. That knowledge lives in each consuming service's
+own build (see "How order-service/stock-service invoke this" below). To run it against any
+AsyncAPI operation spec by hand:
 
 ```bash
 npm install
-npm run test:order-service   # generates into ../order-service/target/...
-npm run test:stock-service   # generates into ../stock-service/target/...
-npm test                     # both
+node node_modules/@asyncapi/cli/bin/run_bin generate fromTemplate \
+  <path-to-spec.yaml> . \
+  -o <output-dir> \
+  --param javaPackage=<package for models> \
+  --param messagingPackage=<package for the publisher/consumer> \
+  --param javaSourceRoot=<root Java sources are written under, relative to -o> \
+  --param resourcesRoot=<root the Kafka binder config is written under, relative to -o> \
+  --force-write
 ```
 
-Each script runs the template directly against the real spec files in the sibling
-`order-service`/`stock-service` modules (not a toy fixture), with `-o` pointed at the module root
-and four parameters:
-
-- `javaPackage` — Java package for the generated record/enum models
-- `messagingPackage` — Java package for the generated publisher/consumer class
-- `javaSourceRoot` — root folder Java sources are written under (relative to `-o`)
-- `resourcesRoot` — root folder the Kafka binder config is written under (relative to `-o`)
-
 The template writes into full package-path-nested `<File name="...">`s, e.g.
-`${javaSourceRoot}/nl/craftsmen/.../event/OrderCreated.java`. The test scripts point
-`javaSourceRoot`/`resourcesRoot` at `target/generated-sources/asyncapi-template` and
-`target/generated-resources`, so generated code stays out of the hand-written `src/main` tree —
-same convention the `asyncapi-codegen` Java module uses. Point them at `src/main/java` /
-`src/main/resources` instead if you want the output checked into source control.
+`${javaSourceRoot}/nl/craftsmen/.../event/OrderCreated.java`. Point `javaSourceRoot`/`resourcesRoot`
+at something like `target/generated-sources/asyncapi-template` / `target/generated-resources` to
+keep generated code out of a hand-written `src/main` tree, or at `src/main/java` /
+`src/main/resources` directly if you want the output checked into source control.
+
+## How order-service/stock-service invoke this
+
+Both `pom.xml`s run this template via two `exec-maven-plugin` executions in the `generate-sources`
+phase: `install-asyncapi-template` (`npm install` in this directory) and
+`generate-asyncapi-kafka-artifacts` (`node node_modules/@asyncapi/cli/bin/run_bin generate
+fromTemplate ...`, invoking this template's *own* pinned `@asyncapi/cli` install directly rather
+than going through `npx`, precisely to avoid the `uuid` ESM issue below depending on whatever npx
+happens to resolve that day). See the `asyncapi.template.*`/`node.executable`/`npm.executable`
+properties and the two executions in either service's `pom.xml` for the exact wiring.
 
 ## A known environment caveat (not a template bug)
 
@@ -80,7 +90,5 @@ that don't exist yet, so generation fails with `ENOENT` on the first file that n
 directory. `hooks/index.js` works around it with a `generate:before` hook that pre-creates the two
 package directories and the resources root from `generator.templateParams` before rendering starts.
 
-## This template does **not** run as part of the Maven build
-
-It's a standalone proof of concept for comparing the official template mechanism against the
-`asyncapi-codegen` Java module — not wired into `order-service`/`stock-service`'s `pom.xml`.
+Building `order-service`/`stock-service` on this machine currently requires Node ≤ ~24 on `PATH`
+(or `-Dnode.executable=/path/to/compatible/node`) for the same reason.

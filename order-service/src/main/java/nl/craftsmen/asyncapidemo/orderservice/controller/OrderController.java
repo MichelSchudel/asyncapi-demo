@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import nl.craftsmen.asyncapidemo.orderservice.event.OrderCreated;
 import nl.craftsmen.asyncapidemo.orderservice.event.OrderSource;
-import nl.craftsmen.asyncapidemo.orderservice.messaging.OrderEventPublisher;
+import nl.craftsmen.asyncapidemo.orderservice.messaging.OrderCreatedPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,10 +22,10 @@ import java.util.UUID;
 @Tag(name = "Orders", description = "Place orders that are published as OrderCreated events")
 public class OrderController {
 
-    private final OrderEventPublisher orderEventPublisher;
+    private final OrderCreatedPublisher orderCreatedPublisher;
 
-    public OrderController(OrderEventPublisher orderEventPublisher) {
-        this.orderEventPublisher = orderEventPublisher;
+    public OrderController(OrderCreatedPublisher orderCreatedPublisher) {
+        this.orderCreatedPublisher = orderCreatedPublisher;
     }
 
     @PostMapping
@@ -35,22 +35,14 @@ public class OrderController {
     @ApiResponse(responseCode = "400", description = "Invalid order payload")
     public ResponseEntity<OrderCreatedResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
         List<nl.craftsmen.asyncapidemo.orderservice.event.OrderItem> items = orderRequest.items().stream()
-                .map(item -> {
-                    var orderItem = new nl.craftsmen.asyncapidemo.orderservice.event.OrderItem();
-                    orderItem.setProductId(item.productId());
-                    orderItem.setQuantity(item.quantity());
-                    return orderItem;
-                })
+                .map(item -> new nl.craftsmen.asyncapidemo.orderservice.event.OrderItem(item.productId(), item.quantity()))
                 .toList();
 
         String id = UUID.randomUUID().toString();
 
-        OrderCreated event = new OrderCreated();
-        event.setId(id);
-        event.setSource(OrderSource.CUSTOMER);
-        event.setItems(items);
+        OrderCreated event = new OrderCreated(id, OrderSource.CUSTOMER, items);
 
-        orderEventPublisher.publish(event);
+        orderCreatedPublisher.publish(event);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new OrderCreatedResponse(id));
     }

@@ -4,18 +4,5 @@ server:
 spring:
   application:
     name: stock-service
-  cloud:
-    function:
-      definition: stockUpdate
-    stream:
-      bindings:
-        stockUpdate-in-0:
-          destination: orders.created
-          group: stock-service
-      kafka:
-        binder:
-          brokers: localhost:19092
-        bindings:
-          stockUpdate-in-0:
-            consumer:
-              startOffset: earliest
+  config:
+    import: optional:classpath:/application-asyncapi.yml
