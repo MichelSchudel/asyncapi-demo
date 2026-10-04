@@ -18,6 +18,8 @@
 
     <properties>
         <springdoc-openapi.version>3.1.1</springdoc-openapi.version>
+        <openapi-generator.version>7.25.0</openapi-generator.version>
+        <openapi.spec>${project.basedir}/src/main/resources/openapi/order-service.yaml</openapi.spec>
         <npx.executable>npx</npx.executable>
         <node.executable>node</node.executable>
         <npm.executable>npm</npm.executable>
@@ -91,7 +93,7 @@
                                 <argument>@asyncapi/cli</argument>
                                 <argument>generate</argument>
                                 <argument>fromTemplate</argument>
-                                <argument>src/main/resources/order-events-send.yaml</argument>
+                                <argument>src/main/resources/asyncapi/order-events-send.yaml</argument>
                                 <argument>@asyncapi/html-template@latest</argument>
                                 <argument>-o</argument>
                                 <argument>${asyncapi.docs.output}</argument>
@@ -130,7 +132,7 @@
                                 <argument>${asyncapi.cli.entrypoint}</argument>
                                 <argument>generate</argument>
                                 <argument>fromTemplate</argument>
-                                <argument>${project.basedir}/src/main/resources/order-events-send.yaml</argument>
+                                <argument>${project.basedir}/src/main/resources/asyncapi/order-events-send.yaml</argument>
                                 <argument>${asyncapi.template.dir}</argument>
                                 <argument>-o</argument>
                                 <argument>${project.basedir}</argument>
@@ -149,6 +151,39 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-order-api</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${openapi.spec}</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.build.directory}/generated-sources/openapi</output>
+                            <apiPackage>nl.craftsmen.asyncapidemo.orderservice.api</apiPackage>
+                            <modelPackage>nl.craftsmen.asyncapidemo.orderservice.api.model</modelPackage>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useSpringBoot4>true</useSpringBoot4>
+                                <useJackson3>true</useJackson3>
+                                <useTags>true</useTags>
+                                <useBeanValidation>true</useBeanValidation>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <documentationProvider>springdoc</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
+                                <sourceFolder>.</sourceFolder>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.6.0</version>
@@ -162,6 +197,7 @@
                         <configuration>
                             <sources>
                                 <source>${asyncapi.template.sources.root}</source>
+                                <source>${project.build.directory}/generated-sources/openapi</source>
                             </sources>
                         </configuration>
                     </execution>

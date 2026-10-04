@@ -34,41 +34,41 @@ npx @asyncapi/cli start studio
 
 Validate the spec in the order-service:
 ```
-npx @asyncapi/cli validate order-service/src/main/resources/order-events-send.yaml
+npx @asyncapi/cli validate order-service/src/main/resources/asyncapi/order-events-send.yaml
 
 ```
 Generate html docs for the message spec:
 ```
-npx @asyncapi/cli generate fromTemplate order-service/src/main/resources/order-events.yaml @asyncapi/html-template@latest -o ./html-docs --force-write -i    
+npx @asyncapi/cli generate fromTemplate order-service/src/main/resources/asyncapi/order-events.yaml @asyncapi/html-template@latest -o ./html-docs --force-write -i    
 ```
 
 
 Generate html docs for the order service including operations (this is also integrated into the build already)::
 ```
-npx @asyncapi/cli generate fromTemplate order-service/src/main/resources/order-events-send.yaml @asyncapi/html-template@latest -o ./html-docs --force-write -i
+npx @asyncapi/cli generate fromTemplate order-service/src/main/resources/asyncapi/order-events-send.yaml @asyncapi/html-template@latest -o ./html-docs --force-write -i
 ```
 
 Merge spec parts into one bundle and generate html docs:
 
 ```
-npx @asyncapi/cli bundle order-service/src/main/resources/order-events-send.yaml -o order-events-send.bundled.yaml
+npx @asyncapi/cli bundle order-service/src/main/resources/asyncapi/order-events-send.yaml -o order-events-send.bundled.yaml
 npx @asyncapi/cli generate fromTemplate order-events-send.bundled.yaml @asyncapi/html-template@latest -o ./html-docs --force-write -i
 ```
 
 
 Generate example for gcp, showing broker bindings:
 ```
-npx @asyncapi/cli generate fromTemplate order-service/src/main/resources/order-events-send-gcp.yaml @asyncapi/html-template@latest -o ./html-docs-gcp --force-write -i
+npx @asyncapi/cli generate fromTemplate order-service/src/main/resources/asyncapi/order-events-send-gcp.yaml @asyncapi/html-template@latest -o ./html-docs-gcp --force-write -i
 ```
 
 #generate java models (this is also integrated into the build already):
 ```
-npx @asyncapi/cli generate models java order-service/src/main/resources/order-events-send.yaml -o ./java-models --packageName=nl.craftsmen.asyncapidemo.orderservice.kafka
+npx @asyncapi/cli generate models java order-service/src/main/resources/asyncapi/order-events-send.yaml -o ./java-models --packageName=nl.craftsmen.asyncapidemo.orderservice.kafka
 ```
 
 #generate kotlin models:
 ```
-npx @asyncapi/cli generate models kotlin order-service/src/main/resources/order-events-send.yaml -o ./kotlin-models --packageName=nl.craftsmen.asyncapidemo.orderservice.kafka
+npx @asyncapi/cli generate models kotlin order-service/src/main/resources/asyncapi/order-events-send.yaml -o ./kotlin-models --packageName=nl.craftsmen.asyncapidemo.orderservice.kafka
 ```
 
 ## Running the build
