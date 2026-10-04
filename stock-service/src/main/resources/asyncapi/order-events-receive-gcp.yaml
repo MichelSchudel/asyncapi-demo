@@ -1,0 +1,58 @@
+asyncapi: 3.0.0
+info:
+  title: Stock update (GCP Pub/Sub demo)
+  version: 1.0.0
+  description: >
+    Demo variant of the stock service's consuming spec, showing how the
+    servers/channels/bindings blocks look when the transport is Google
+    Cloud Pub/Sub instead of Kafka. For demo purposes only - not wired
+    up to any code generation.
+
+servers:
+  gcpPubSub:
+    host: pubsub.googleapis.com
+    protocol: googlepubsub
+    description: Google Cloud Pub/Sub (my-gcp-project)
+    security:
+      - $ref: '#/components/securitySchemes/googleOAuth'
+
+channels:
+  orderCreated:
+    address: projects/my-gcp-project/topics/orders-created
+    servers:
+      - $ref: '#/servers/gcpPubSub'
+    messages:
+      OrderCreated:
+        $ref: './order-events.yaml#/components/messages/OrderCreated'
+    bindings:
+      googlepubsub:
+        labels:
+          team: order-service
+        messageStoragePolicy:
+          allowedPersistenceRegions:
+            - europe-west1
+        messageRetentionDuration: 86400s
+        schemaSettings:
+          encoding: json
+          name: projects/my-gcp-project/schemas/order-created-schema
+
+operations:
+  receiveOrderCreated:
+    action: receive
+    channel:
+      $ref: '#/channels/orderCreated'
+    summary: Consume a created order from the orders-created Pub/Sub topic.
+    x-googlepubsub:
+      subscription: projects/my-gcp-project/subscriptions/stock-service-orders-created
+      ackDeadlineSeconds: 30
+
+components:
+  securitySchemes:
+    googleOAuth:
+      type: oauth2
+      description: Service account / Google OAuth2 credentials
+      flows:
+        clientCredentials:
+          tokenUrl: https://oauth2.googleapis.com/token
+          availableScopes:
+            https://www.googleapis.com/auth/pubsub: Full access to Pub/Sub
