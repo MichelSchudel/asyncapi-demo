@@ -1,4 +1,6 @@
 # prepare demo
+* make sure mouse wheel zoom is active
+* make sure screen is mirroring, not duplicating.
 * have docker / rancher running.
 * make sure ayncapi cli works, either through npx or shim
 * run the maven build and start the apps
