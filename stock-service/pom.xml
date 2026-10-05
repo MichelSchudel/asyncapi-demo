@@ -76,18 +76,17 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${npx.executable}</executable>
-                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <executable>${node.executable}</executable>
+                            <workingDirectory>${asyncapi.template.dir}</workingDirectory>
                             <arguments>
-                                <argument>@asyncapi/cli</argument>
+                                <argument>${asyncapi.cli.entrypoint}</argument>
                                 <argument>generate</argument>
                                 <argument>fromTemplate</argument>
-                                <argument>src/main/resources/asyncapi/order-events-receive.yaml</argument>
-                                <argument>@asyncapi/html-template@latest</argument>
+                                <argument>${project.basedir}/src/main/resources/asyncapi/order-events-receive.yaml</argument>
+                                <argument>${asyncapi.template.dir}/node_modules/@asyncapi/html-template</argument>
                                 <argument>-o</argument>
                                 <argument>${asyncapi.docs.output}</argument>
                                 <argument>--force-write</argument>
-                                <argument>-i</argument>
                             </arguments>
                             <environmentVariables>
                                 <PUPPETEER_SKIP_DOWNLOAD>true</PUPPETEER_SKIP_DOWNLOAD>

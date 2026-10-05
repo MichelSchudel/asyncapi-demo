@@ -6,6 +6,7 @@
 * run the maven build and start the apps
 * stop the apps and clean again
 * pre-load the asyncapi cli commands into the terminal. Test them.
+* disable sendng online telemetrics: `asyncapi config analytics --disable `
 
 
 
@@ -56,7 +57,7 @@ npm install
 Then generate:
 ```
 node node_modules/@asyncapi/cli/bin/run_bin generate fromTemplate \
- ../order-service/src/main/resources/asyncapi/order-events-send.yaml . \
+ ../order-service/src/main/resources/asyncapi/order-events-send.yaml ./ \
  -o ../order-service \
  --param javaPackage=nl.craftsmen.asyncapidemo.orderservice.event \
  --param messagingPackage=nl.craftsmen.asyncapidemo.orderservice.messaging \
@@ -64,7 +65,7 @@ node node_modules/@asyncapi/cli/bin/run_bin generate fromTemplate \
  --param resourcesRoot=target/generated-resources \
  --force-write
 ```
-- `generate fromTemplate <spec> <template>`: the spec is the order-service's send spec, the template is the current folder (`.`), our local `asyncapi-kafka-template`.
+- `generate fromTemplate <spec> <template>`: the spec is the order-service's send spec, the template is the current folder (`./`, keep the trailing slash: a bare `.` is treated as an npm package name and triggers a registry install, which hangs offline), our local `asyncapi-kafka-template`.
 - `-o ../order-service`: output root; the `javaSourceRoot` and `resourcesRoot` params are relative to it. The template creates missing output folders itself (via a `generate:before` hook).
 - `--param ...`: the Java packages for the models and the publisher, and where to put the generated sources and the `application-asyncapi.yml` with the Kafka bindings.
 

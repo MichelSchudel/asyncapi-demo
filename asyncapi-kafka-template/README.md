@@ -49,7 +49,7 @@ AsyncAPI operation spec by hand:
 ```bash
 npm install
 node node_modules/@asyncapi/cli/bin/run_bin generate fromTemplate \
-  <path-to-spec.yaml> . \
+  <path-to-spec.yaml> ./ \
   -o <output-dir> \
   --param javaPackage=<package for models> \
   --param messagingPackage=<package for the publisher/consumer> \
