@@ -55,7 +55,14 @@ npm install
 ```
 Then generate:
 ```
-node node_modules/@asyncapi/cli/bin/run_bin generate fromTemplate ../order-service/src/main/resources/asyncapi/order-events-send.yaml . -o ../order-service --param javaPackage=nl.craftsmen.asyncapidemo.orderservice.event --param messagingPackage=nl.craftsmen.asyncapidemo.orderservice.messaging --param javaSourceRoot=target/generated-sources/asyncapi-template --param resourcesRoot=target/generated-resources --force-write
+node node_modules/@asyncapi/cli/bin/run_bin generate fromTemplate \
+ ../order-service/src/main/resources/asyncapi/order-events-send.yaml . \
+ -o ../order-service \
+ --param javaPackage=nl.craftsmen.asyncapidemo.orderservice.event \
+ --param messagingPackage=nl.craftsmen.asyncapidemo.orderservice.messaging \
+ --param javaSourceRoot=target/generated-sources/asyncapi-template \
+ --param resourcesRoot=target/generated-resources \
+ --force-write
 ```
 - `generate fromTemplate <spec> <template>`: the spec is the order-service's send spec, the template is the current folder (`.`), our local `asyncapi-kafka-template`.
 - `-o ../order-service`: output root; the `javaSourceRoot` and `resourcesRoot` params are relative to it. The template creates missing output folders itself (via a `generate:before` hook).
