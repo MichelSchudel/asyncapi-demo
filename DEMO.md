@@ -25,17 +25,17 @@
 
 ## validation
 ```
-npx @asyncapi/cli validate order-service/src/main/resources/asyncapi/order-events-send.yaml
+asyncapi validate order-service/src/main/resources/asyncapi/order-events-send.yaml
 ```
 
 ## html docs
 ```
-npx @asyncapi/cli generate fromTemplate order-service/src/main/resources/asyncapi/order-events-send.yaml @asyncapi/html-template@latest -o ./html-docs --force-write -i
+asyncapi generate fromTemplate order-service/src/main/resources/asyncapi/order-events-send.yaml @asyncapi/html-template@latest -o ./html-docs --force-write -i
 ```
 open the docs in a browser and explain you can easily wire this thing up in the maven build using the maven exec plugin.
 ## models
 ```
-npx @asyncapi/cli generate models java order-service/src/main/resources/asyncapi/order-events-send.yaml -o ./java-models --packageName=nl.craftsmen.asyncapidemo.orderservice.kafka
+asyncapi generate models java order-service/src/main/resources/asyncapi/order-events-send.yaml -o ./java-models --packageName=nl.craftsmen.asyncapidemo.orderservice.kafka
 ```
 show the models and that they're not very nice, old school java.
 
