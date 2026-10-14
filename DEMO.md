@@ -39,6 +39,22 @@ asyncapi generate models java order-service/src/main/resources/asyncapi/order-ev
 ```
 show the models and that they're not very nice, old school java.
 
+## Modelina: Java records
+The CLI wraps Modelina, but doesn't expose all of its options. Records are one of those, so call the Modelina library directly (the globally installed AsyncAPI CLI bundles it, so `NODE_PATH` points there):
+```
+NODE_PATH="$(npm root -g)/@asyncapi/cli/node_modules" node -e "
+const {JavaGenerator}=require('@asyncapi/modelina');
+const {Parser,fromFile}=require('@asyncapi/parser');
+const fs=require('fs');
+fromFile(new Parser(),process.argv[1]).parse().then(({document})=>new JavaGenerator({modelType:'record',collectionType:'List'}).generateCompleteModels(document,{packageName:'nl.craftsmen.asyncapidemo.orderservice.kafka'})).then(ms=>{fs.mkdirSync('java-records',{recursive:true});ms.forEach(m=>fs.writeFileSync('java-records/'+m.modelName+'.java',m.result))})
+" order-service/src/main/resources/asyncapi/order-events-send.yaml
+```
+- `modelType: 'record'`: generate Java records instead of classes with getters and setters.
+- `collectionType: 'List'`: use `List<OrderItem>` instead of `OrderItem[]`.
+- `generateCompleteModels` with `packageName`: adds the package and imports, so the files are ready to compile.
+
+Show `java-records/OrderCreated.java`: one line instead of a page of boilerplate. Compare with `java-models`.
+
 ## Generator
 Now explain that we not only want to generate some data classes, but the code for the consumer and producer as well.
 So dive into the generator. Explain the templates. We need three things:

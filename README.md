@@ -66,6 +66,16 @@ asyncapi generate fromTemplate order-service/src/main/resources/asyncapi/order-e
 asyncapi generate models java order-service/src/main/resources/asyncapi/order-events-send.yaml -o ./java-models --packageName=nl.craftsmen.asyncapidemo.orderservice.kafka
 ```
 
+#generate java records with Modelina (the CLI has no records option, so this calls the Modelina library bundled with the global AsyncAPI CLI):
+```
+NODE_PATH="$(npm root -g)/@asyncapi/cli/node_modules" node -e "
+const {JavaGenerator}=require('@asyncapi/modelina');
+const {Parser,fromFile}=require('@asyncapi/parser');
+const fs=require('fs');
+fromFile(new Parser(),process.argv[1]).parse().then(({document})=>new JavaGenerator({modelType:'record',collectionType:'List'}).generateCompleteModels(document,{packageName:'nl.craftsmen.asyncapidemo.orderservice.kafka'})).then(ms=>{fs.mkdirSync('java-records',{recursive:true});ms.forEach(m=>fs.writeFileSync('java-records/'+m.modelName+'.java',m.result))})
+" order-service/src/main/resources/asyncapi/order-events-send.yaml
+```
+
 #generate kotlin models:
 ```
 asyncapi generate models kotlin order-service/src/main/resources/asyncapi/order-events-send.yaml -o ./kotlin-models --packageName=nl.craftsmen.asyncapidemo.orderservice.kafka
